@@ -250,13 +250,13 @@ Commands support multiple formats:
 │  Control App    │ ───────────► │    OSCPlayer    │
 │  (Chataigne)    │ ◄────────── │   (Server :8000)│
 └─────────────────┘              └────────┬────────┘
-                                          │
-                                          │ IPC
-                                          ▼
-                                   ┌─────────────────┐
-                                   │  mpv (child)    │
-                                   │ (socket ctrl)   │
-                                   └─────────────────┘
+                                           │
+                                           │ IPC
+                                           ▼
+                                    ┌─────────────────┐
+                                    │  mpv (child)    │
+                                    │ (socket ctrl)   │
+                                    └─────────────────┘
 ```
 
 ## File Structure
