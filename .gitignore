@@ -1,0 +1,22 @@
+# Build outputs
+oscplayer-*
+build/
+*.o
+*.obj
+*.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# mpv
+mpv-v*/
+
+# OSCPlayer specific
+OSCPlayer.noisette
