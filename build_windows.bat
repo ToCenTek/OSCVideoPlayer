@@ -6,7 +6,8 @@ set SRC=src\Player.cpp src\DisplayInfo.cpp src\Platform.cpp src\OSCServer.cpp sr
 
 echo Compiling...
 
-C:\msys64\mingw64\bin\g++ -O2 -std=c++17 -mconsole -Iinclude %SRC% -o build\oscplayer.exe -lws2_32 -lwinmm
+REM Use system dnsapi.dll and enable Bonjour
+C:\msys64\mingw64\bin\g++ -O2 -std=c++17 -mconsole -Iinclude -DHAVE_BONJOUR=1 %SRC% -o build\oscplayer.exe -lws2_32 -lwinmm -ldnsapi
 
 if exist build\oscplayer.exe (
     echo OK
