@@ -60,6 +60,10 @@ make
 **Linux:**
 
 ```bash
+# 安装依赖
+sudo apt install libavahi-client-dev libavahi-glib-dev
+
+# 编译
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
@@ -77,11 +81,11 @@ oscplayer.exe
 
 ### 依赖说明
 
-| 平台      | 必需组件                           |
-| ------- | ------------------------------ |
-| macOS   | `mpv` (`brew install mpv`)     |
-| Linux   | `mpv`, `pulseaudio` (用于音频设备列表) |
-| Windows | `mpv` (加入 PATH)                |
+| 平台      | 必需组件                                      |
+| ------- | ----------------------------------------- |
+| macOS   | `mpv` (`brew install mpv`)              |
+| Linux   | `mpv`, `libavahi-client-dev`, `libavahi-glib-dev` |
+| Windows | `mpv` (加入 PATH)                         |
 
 ## 使用方法
 
