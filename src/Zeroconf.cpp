@@ -7,6 +7,7 @@
 #ifdef __APPLE__
     #include <CoreFoundation/CoreFoundation.h>
     #include <dns_sd.h>
+    #include <arpa/inet.h>
 #elif _WIN32
     #include <winsock2.h>
     #include <ws2tcpip.h>
@@ -67,7 +68,7 @@ void Zeroconf::start(const std::string& serviceName, const std::string& serviceT
         serviceType.c_str(),
         nullptr,
         nullptr,
-        port,
+        htons(port),
         0,
         nullptr,
         nullptr,
