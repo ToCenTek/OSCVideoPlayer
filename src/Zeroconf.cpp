@@ -10,12 +10,17 @@
     #include <arpa/inet.h>
     #define ZEROCONF_AVAILABLE 1
 #elif _WIN32
-    #include <winsock2.h>
-    #include <ws2tcpip.h>
-    #pragma comment(lib, "ws2_32.lib")
-    #include <dns_sd.h>
-    #include <arpa/inet.h>
-    #define ZEROCONF_AVAILABLE 1
+    // Windows - try to include Bonjour if available
+    #ifdef HAVE_BONJOUR
+        #include <winsock2.h>
+        #include <ws2tcpip.h>
+        #pragma comment(lib, "ws2_32.lib")
+        #include <dns_sd.h>
+        #include <arpa/inet.h>
+        #define ZEROCONF_AVAILABLE 1
+    #else
+        #define ZEROCONF_AVAILABLE 0
+    #endif
 #else
     #ifdef HAVE_AVAHI
         #include <glib-2.0/glib.h>
