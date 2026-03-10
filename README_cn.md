@@ -73,10 +73,19 @@ make
 **Windows:**
 
 ```bash
+# 安装 MinGW-w64 (MSYS2)
+# https://www.msys2.org/
+
+# 编译
 mkdir build && cd build
 cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
 mingw32-make
 oscplayer.exe
+```
+
+或使用提供的脚本:
+```bash
+build_windows.bat
 ```
 
 ### 依赖说明
@@ -85,7 +94,30 @@ oscplayer.exe
 | ------- | ----------------------------------------- |
 | macOS   | `mpv` (`brew install mpv`)              |
 | Linux   | `mpv`, `pkg-config`, `libavahi-core-dev`, `libavahi-glib-dev`, `libglib2.0-dev` |
-| Windows | `mpv` (加入 PATH)                         |
+| Windows | `mpv` (加入 PATH), `MinGW-w64`, `Bonjour` (系统自带 dnssd.dll) |
+
+**Windows 依赖安装:**
+
+1. **MinGW-w64**: 安装 [MSYS2](https://www.msys2.org/)，在 MSYS2 MinGW 64-bit 环境中编译
+2. **mpv**: 从 https://mpv.io/ 下载并加入 PATH 环境变量
+3. **Bonjour**: Windows 自带 `C:\Windows\System32\dnssd.dll`，无需额外安装
+
+**Windows 编译步骤:**
+
+```cmd
+# 使用提供的脚本（推荐）
+build_windows.bat
+
+# 手动编译
+mkdir build
+set SRC=src\Player.cpp src\DisplayInfo.cpp src\Platform.cpp src\OSCServer.cpp src\OSCMessage.cpp src\AudioDevice.cpp src\Zeroconf.cpp src\main.cpp
+g++ -O2 -std=c++17 -mconsole -Iinclude -DHAVE_BONJOUR=1 %SRC% -o build\oscplayer.exe -lws2_32 -lwinmm libdnssd.a
+```
+
+**Windows Zeroconf 说明:**
+- 使用系统自带的 `dnssd.dll` (Bonjour) 进行 Zeroconf 服务发布
+- 编译脚本会自动创建导入库 `libdnssd.a`
+- 确保 Windows 防火墙允许 `dnssd.dll` 通信
 
 **Linux 安装依赖:**
 ```bash
