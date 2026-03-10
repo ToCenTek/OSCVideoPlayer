@@ -13,6 +13,7 @@
     #include <ws2tcpip.h>
     #pragma comment(lib, "ws2_32.lib")
     #include <dns_sd.h>
+    #include <arpa/inet.h>
 #else
     #include <avahi-client/client.h>
     #include <avahi-client/service.h>
@@ -93,7 +94,7 @@ void Zeroconf::start(const std::string& serviceName, const std::string& serviceT
         serviceType.c_str(),
         nullptr,
         nullptr,
-        port,
+        htons(port),
         0,
         nullptr,
         nullptr,
