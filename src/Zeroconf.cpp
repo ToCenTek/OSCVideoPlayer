@@ -18,10 +18,11 @@
     #define ZEROCONF_AVAILABLE 1
 #else
     #ifdef HAVE_AVAHI
-        #include <avahi-core/service.h>
-        #include <avahi-core/client.h>
+        #include <avahi-client/publish.h>
+        #include <avahi-client/client.h>
         #include <avahi-glib/glib-watch.h>
-        #include <glib.h>
+        #include <glib-2.0/glib.h>
+#include <avahi-common/thread-watch.h>
     #endif
     #define ZEROCONF_AVAILABLE 0
 #endif
