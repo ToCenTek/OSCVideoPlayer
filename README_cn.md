@@ -61,7 +61,7 @@ make
 
 ```bash
 # 安装依赖
-sudo apt install libavahi-client-dev libavahi-glib-dev
+sudo apt install mpv pkg-config libavahi-core-dev libavahi-glib-dev libglib2.0-dev
 
 # 编译
 mkdir build && cd build
@@ -84,8 +84,13 @@ oscplayer.exe
 | 平台      | 必需组件                                      |
 | ------- | ----------------------------------------- |
 | macOS   | `mpv` (`brew install mpv`)              |
-| Linux   | `mpv`, `libavahi-client-dev`, `libavahi-glib-dev` |
+| Linux   | `mpv`, `pkg-config`, `libavahi-core-dev`, `libavahi-glib-dev`, `libglib2.0-dev` |
 | Windows | `mpv` (加入 PATH)                         |
+
+**Linux 安装依赖:**
+```bash
+sudo apt install mpv pkg-config libavahi-core-dev libavahi-glib-dev libglib2.0-dev
+```
 
 ## 使用方法
 
