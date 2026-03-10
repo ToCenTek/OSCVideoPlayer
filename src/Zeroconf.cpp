@@ -18,13 +18,15 @@
     #define ZEROCONF_AVAILABLE 1
 #else
     #ifdef HAVE_AVAHI
+        #include <glib-2.0/glib.h>
+        #include <avahi-common/thread-watch.h>
         #include <avahi-client/publish.h>
         #include <avahi-client/client.h>
         #include <avahi-glib/glib-watch.h>
-        #include <glib-2.0/glib.h>
-#include <avahi-common/thread-watch.h>
+        #define ZEROCONF_AVAILABLE 1
+    #else
+        #define ZEROCONF_AVAILABLE 0
     #endif
-    #define ZEROCONF_AVAILABLE 0
 #endif
 
 struct Zeroconf::Impl {
@@ -40,7 +42,7 @@ struct Zeroconf::Impl {
     std::string serviceType;
     int port = 0;
     
-    static void callback(AvahiEntryGroup* g, AvahiClient* c, AvahiEntryGroupState state, void* userdata) {
+    static void callback(AvahiEntryGroup* g, AvahiEntryGroupState state, void* userdata) {
         auto* self = static_cast<Impl*>(userdata);
         if (state == AVAHI_ENTRY_GROUP_ESTABLISHED) {
             std::cout << "Avahi service '" << self->serviceName << "' registered successfully" << std::endl;
@@ -151,7 +153,7 @@ void Zeroconf::start(const std::string& serviceName, const std::string& serviceT
         m_impl->group,
         AVAHI_IF_UNSPEC,
         AVAHI_PROTO_UNSPEC,
-        0,
+        (AvahiPublishFlags)0,
         serviceName.c_str(),
         serviceType.c_str(),
         nullptr,
