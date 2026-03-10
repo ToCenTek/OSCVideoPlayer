@@ -54,6 +54,9 @@ endif()
 
 # Linux - Avahi
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Try to find Avahi using pkg-config
+    set(AVAHI_INCLUDE_DIRS "/usr/include/avahi-core;/usr/include/avahi-glib;/usr/include/avahi-common")
+    
     find_package(PkgConfig)
     if(PkgConfig_FOUND)
         pkg_check_modules(AVAHIGLIB QUIET avahi-glib avahi-client)
@@ -61,9 +64,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if(AVAHIGLIB_FOUND)
         add_compile_definitions(HAVE_AVAHI=1)
         target_link_libraries(oscplayer ${AVAHIGLIB_LIBRARIES})
-        # Add include paths for avahi
-        include_directories(SYSTEM ${AVAHIGLIB_INCLUDE_DIRS} /usr/include)
-        message(STATUS "Avahi include dirs: ${AVAHIGLIB_INCLUDE_DIRS}")
+        include_directories(SYSTEM ${AVAHI_INCLUDE_DIRS})
         message(STATUS "Avahi support enabled")
     else()
         message(STATUS "Avahi not found, Zeroconf will be disabled")
