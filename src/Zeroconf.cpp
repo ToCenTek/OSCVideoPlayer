@@ -8,17 +8,22 @@
     #include <CoreFoundation/CoreFoundation.h>
     #include <dns_sd.h>
     #include <arpa/inet.h>
+    #define ZEROCONF_AVAILABLE 1
 #elif _WIN32
     #include <winsock2.h>
     #include <ws2tcpip.h>
     #pragma comment(lib, "ws2_32.lib")
     #include <dns_sd.h>
     #include <arpa/inet.h>
+    #define ZEROCONF_AVAILABLE 1
 #else
-    #include <avahi-client/client.h>
-    #include <avahi-client/service.h>
-    #include <avahi-glib/glib-watch.h>
-    #include <glib.h>
+    #ifdef HAVE_AVAHI
+        #include <avahi-client/client.h>
+        #include <avahi-client/service.h>
+        #include <avahi-glib/glib-watch.h>
+        #include <glib.h>
+    #endif
+    #define ZEROCONF_AVAILABLE 0
 #endif
 
 struct Zeroconf::Impl {
@@ -26,7 +31,7 @@ struct Zeroconf::Impl {
     DNSServiceRef sdRef = nullptr;
 #elif _WIN32
     DNSServiceRef sdRef = nullptr;
-#else
+#elif defined(HAVE_AVAHI)
     AvahiThreadedPoll* poll = nullptr;
     AvahiClient* client = nullptr;
     AvahiEntryGroup* group = nullptr;
@@ -58,6 +63,7 @@ void Zeroconf::start(const std::string& serviceName, const std::string& serviceT
         stop();
     }
     
+#if ZEROCONF_AVAILABLE
 #ifdef __APPLE__
     std::cout << "Starting Bonjour service: " << serviceName << " type: " << serviceType << " port: " << port << std::endl;
     
@@ -108,7 +114,7 @@ void Zeroconf::start(const std::string& serviceName, const std::string& serviceT
         std::cerr << "Bonjour registration failed with error: " << err << std::endl;
     }
     
-#else
+#elif defined(HAVE_AVAHI)
     std::cout << "Starting Avahi service: " << serviceName << " type: " << serviceType << " port: " << port << std::endl;
     
     m_impl->poll = avahi_threaded_poll_new();
@@ -158,6 +164,11 @@ void Zeroconf::start(const std::string& serviceName, const std::string& serviceT
     
     m_running = true;
     std::cout << "Avahi service registered successfully" << std::endl;
+#else
+    std::cout << "Zeroconf not available on this platform" << std::endl;
+#endif
+#else
+    std::cout << "Zeroconf support not compiled in" << std::endl;
 #endif
 }
 
@@ -166,6 +177,7 @@ void Zeroconf::stop() {
         return;
     }
     
+#if ZEROCONF_AVAILABLE
 #ifdef __APPLE__
     if (m_impl->sdRef) {
         DNSServiceRefDeallocate(m_impl->sdRef);
@@ -176,7 +188,7 @@ void Zeroconf::stop() {
         DNSServiceRefDeallocate(m_impl->sdRef);
         m_impl->sdRef = nullptr;
     }
-#else
+#elif defined(HAVE_AVAHI)
     if (m_impl->group) {
         avahi_entry_group_free(m_impl->group);
         m_impl->group = nullptr;
@@ -194,4 +206,5 @@ void Zeroconf::stop() {
     
     m_running = false;
     std::cout << "Zeroconf service stopped" << std::endl;
+#endif
 }
