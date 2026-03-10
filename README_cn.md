@@ -1,5 +1,7 @@
 # OSCPlayer
 
+https://github.com/ToCenTek/OSCVideoPlayer
+
 一个基于 C++ 的 OSC (Open Sound Control) 协议控制视频播放器,使用 mpv 进行视频播放,支持 macOS/Linux/Windows。
 
 ## 功能特性
@@ -9,6 +11,7 @@
 - **Unix 域套接字 IPC**: 通过 IPC 套接字与 mpv 通信
 - **多平台支持**: 支持 macOS、Linux 和 Windows
 - **通用二进制**: 同时支持 Intel (x86_64) 和 Apple Silicon (arm64) Mac
+- **Zeroconf 服务发现**: 通过 Bonjour/Avahi 发布服务，支持 TouchOSC 等客户端自动发现
 
 ## 环境要求
 
@@ -256,6 +259,24 @@ oscplayer.exe
 | `/Help`        | 帮助文本    |
 | `/Error`       | 错误消息    |
 | `/Unknown`     | 未知命令    |
+
+## Zeroconf 服务发现
+
+播放器启动时会自动通过 Zeroconf 发布服务，使客户端（如 TouchOSC）可以自动发现服务器。
+
+| 平台   | 服务类型        | 服务名称              |
+| ---- | ----------- | ----------------- |
+| macOS | `_osc._udp.` | `OSCPlayer - [主机名]` |
+| Linux | `_osc._udp.` | `OSCPlayer - [主机名]` |
+| Windows | `_osc._udp.` | `OSCPlayer - [主机名]` |
+
+**端口**: 8000
+
+### TouchOSC 发现服务
+
+1. 确保客户端和播放器在同一网络
+2. 在 TouchOSC 的连接设置中启用 "Auto"
+3. 客户端应能发现 `OSCPlayer - [主机名]` 服务
 
 ## 架构图
 

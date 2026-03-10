@@ -18,6 +18,7 @@ set(SOURCES
     src/OSCServer.cpp
     src/OSCMessage.cpp
     src/Platform.cpp
+    src/Zeroconf.cpp
 )
 
 set(HEADERS
@@ -27,6 +28,7 @@ set(HEADERS
     include/OSCServer.h
     include/OSCMessage.h
     include/Platform.h
+    include/Zeroconf.h
 )
 
 add_executable(oscplayer ${SOURCES} ${HEADERS})
@@ -47,5 +49,13 @@ if(APPLE)
 endif()
 
 if(WIN32)
-    target_link_libraries(oscplayer ws2_32)
+    target_link_libraries(oscplayer ws2_32 dnsapi)
+endif()
+
+# Linux - Avahi
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(AVAHIGLIB REQUIRED avahi-glib avahi-client)
+    target_link_libraries(oscplayer ${AVAHIGLIB_LIBRARIES})
+    target_include_directories(oscplayer PRIVATE ${AVAHIGLIB_INCLUDE_DIRS})
 endif()

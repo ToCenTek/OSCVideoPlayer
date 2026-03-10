@@ -1,6 +1,7 @@
 #include "../include/Player.h"
 #include "../include/OSCServer.h"
 #include "../include/Platform.h"
+#include "../include/Zeroconf.h"
 #include <iostream>
 #include <csignal>
 #include <thread>
@@ -11,6 +12,8 @@
 #ifndef _WIN32
 #include <unistd.h>
 #include <cstdlib>
+#include <ifaddrs.h>
+#include <net/if.h>
 #else
 #include <windows.h>
 #endif
@@ -18,6 +21,43 @@
 std::unique_ptr<Player> g_player;
 std::unique_ptr<OSCServer> g_server;
 std::atomic<bool> g_running{true};
+
+std::string getLocalIPAddress() {
+#ifdef _WIN32
+    char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) == 0) {
+        struct hostent* he = gethostbyname(hostname);
+        if (he) {
+            for (int i = 0; he->h_addr_list[i] != nullptr; i++) {
+                struct in_addr addr;
+                memcpy(&addr, he->h_addr_list[i], sizeof(struct in_addr));
+                char* ip = inet_ntoa(addr);
+                if (strcmp(ip, "127.0.0.1") != 0) {
+                    return std::string(ip);
+                }
+            }
+        }
+    }
+    return "127.0.0.1";
+#else
+    struct ifaddrs* ifaddr = nullptr;
+    if (getifaddrs(&ifaddr) == 0) {
+        for (struct ifaddrs* ptr = ifaddr; ptr != nullptr; ptr = ptr->ifa_next) {
+            if (ptr->ifa_addr && ptr->ifa_addr->sa_family == AF_INET) {
+                char ip[INET_ADDRSTRLEN];
+                struct sockaddr_in* addr = (struct sockaddr_in*)ptr->ifa_addr;
+                inet_ntop(AF_INET, &addr->sin_addr, ip, INET_ADDRSTRLEN);
+                if (strcmp(ip, "127.0.0.1") != 0 && !(ptr->ifa_flags & IFF_LOOPBACK)) {
+                    freeifaddrs(ifaddr);
+                    return std::string(ip);
+                }
+            }
+        }
+        freeifaddrs(ifaddr);
+    }
+    return "127.0.0.1";
+#endif
+}
 
 void signalHandler(int sig) {
     std::cout << "\nShutting down..." << std::endl;
@@ -43,6 +83,7 @@ void signalHandler(int sig) {
     }
     
     if (g_server) g_server->stop();
+    Zeroconf::getInstance().stop();
     _exit(0);
 }
 
@@ -83,7 +124,7 @@ int main(int argc, char* argv[]) {
     oss << std::put_time(std::localtime(&time_t), "%Y-%m-%d %H:%M:%S") << '.' << std::setfill('0') << std::setw(3) << ms.count();
     std::cout << "Starting at: " << oss.str() << std::endl;
     
-    std::cout << "OSCPlayer v1.0.0 - OSC-controlled video player" << std::endl;
+    std::cout << "OSCPlayer v1.0.1 - OSC-controlled video player" << std::endl;
     std::cout << "=================================================" << std::endl;
     std::cout << helpText << std::endl;
     
@@ -105,6 +146,20 @@ int main(int argc, char* argv[]) {
         std::cerr << "Failed to start OSC server" << std::endl;
         return 1;
     }
+    
+    // Start Zeroconf service discovery
+    std::string hostname = "Unknown";
+#ifdef __APPLE__
+    hostname = "macOS";
+#elif _WIN32
+    hostname = "Windows";
+#else
+    hostname = "Linux";
+#endif
+    std::string localIP = getLocalIPAddress();
+    std::cout << "Local IP: " << localIP << std::endl;
+    
+    Zeroconf::getInstance().start("OSCPlayer - " + hostname, "_osc._udp.", 8000);
     
     std::cout << "\nSearching for hello video..." << std::endl;
     std::string helloVideo = g_player->getHelloVideoName();
