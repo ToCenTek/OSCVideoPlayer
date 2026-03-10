@@ -16,7 +16,7 @@
         #include <ws2tcpip.h>
         #pragma comment(lib, "ws2_32.lib")
         #include <dns_sd.h>
-        #include <arpa/inet.h>
+        #define htons(x) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8))
         #define ZEROCONF_AVAILABLE 1
     #else
         #define ZEROCONF_AVAILABLE 0
