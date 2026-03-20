@@ -20,3 +20,10 @@ mpv-v*/
 
 # OSCPlayer specific
 OSCPlayer.noisette
+
+# Android
+.gradle/
+*.apk
+*.aab
+*.keystore
+local.properties
